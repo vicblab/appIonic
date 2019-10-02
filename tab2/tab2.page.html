@@ -1,0 +1,22 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>
+            BLE Scanner
+        </ion-title>
+        <ion-button (click)="discover()" slot="end">
+            <ion-icon name="Bluetooth"></ion-icon>
+            <p>Scan</p>
+        </ion-button>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-list>
+        <ion-card-content ion-item *ngFor="let device of devices">
+            <p>{{device.name || 'Unnamed'}}</p>
+            <p>{{device.id||device}}</p>
+            <p>RSSI: {{device.rssi}}</p>
+            <p>Data: {{device.advertising}}</p>
+        </ion-card-content>
+    </ion-list>
+    </ion-content>
