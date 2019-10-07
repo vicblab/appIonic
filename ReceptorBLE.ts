@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import {  AngularFirestore } from 'angularfire2/firestore';
 
 import { BLE } from '@ionic-native/ble/ngx';
-import { BluetoothSerial } from '@ionic-native/bluetooth-serial/ngx';
+//import { BluetoothSerial } from '@ionic-native/bluetooth-serial/ngx';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { Tab2Page } from './tab2/tab2.page';
 //import { setTimeout } from 'timers';
@@ -17,7 +17,7 @@ export class ServicioFirebaseService {
     
     Collection;
 
-    constructor(private fireStore: AngularFirestore,private ble: BLE, private btle: BluetoothSerial, private geolocation: Geolocation) {
+    constructor(private fireStore: AngularFirestore,private ble: BLE,  private geolocation: Geolocation) {
         this.Collection = fireStore.collection<any>('data');
         console.log(this.Collection);
         this.encenderBT();
@@ -30,7 +30,7 @@ export class ServicioFirebaseService {
     obtenerMisTramas(id:string) {
         this.ble.scan([], 14).subscribe(
             device => {
-                if (device.id.toString() == id) {
+                if (device.id == id) {
                     var adData = new Uint8Array(device.advertising)
                     //Obtengo los 2 bytes del major y los 2 bytes del minor
                     var elMajor = adData[37].toString() + adData[38].toString();
