@@ -32,22 +32,31 @@ export class Tab2Page {
         this.service = new ServicioFirebaseService(fireStore, ble, geolocation);
        // this.text = "hello darkness";
     }
+    ab2str(buf) {
+    return String.fromCharCode.apply(null, new Uint8Array(buf));
+}
+   
+
     discover() {
-  
-       // var decoder = new TextDecoder("utf-8");
-        this.ble.scan([], 15).subscribe(
+       /* this.ble.scan([], 15).subscribe(
             device => {
-                if (device.id == laUuid) {
-                    var adData = new Uint8Array(device.advertising)
-                    device.advertising = adData.toString();
-              
-                    this.onDeviceDiscovered(device)//JSON.stringify(decoder.decode(device.advertising)))
-                }
-                     err => {
+                //String.fromCharCode.apply(null, new Uint8Array(device.advertising))
+                var buffer=device.advertising.slice(25, 29);
+
+                var adData = new Uint16Array(buffer);
+               
+                device.advertising = adData.toString();
+                
+                this.onDeviceDiscovered(device);
+
+                err => {
                     this.devices.push(err)
                 }
-            });
+            });*/
+       
+      
         this.service.obtenerMisTramas(laUuid);
+       
     }
     
     onDeviceDiscovered(device) {

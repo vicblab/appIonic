@@ -21,7 +21,7 @@ export class ServicioFirebaseService {
         this.Collection = fireStore.collection<any>('data');
         console.log(this.Collection);
         this.encenderBT();
-       // this.suscribirse();
+       
       
     }
     
@@ -31,39 +31,31 @@ export class ServicioFirebaseService {
         this.ble.scan([], 14).subscribe(
             device => {
                 if (device.id == id) {
-                    var adData = new Uint8Array(device.advertising)
-                    //Obtengo los 2 bytes del major y los 2 bytes del minor
-                    var elMajor = adData[37].toString() + adData[38].toString();
-                    var elMinor = adData[39].toString() + adData[40].toString();
+                    //obtengo un nuevo buffer que solo contenga los dos bytes del major y minor a partir del buffer de advertising data
+                    var bufferDeSoloMajYMin = device.advertising.slice(25, 29);
+                    //convierto el buffer en una lista de dos unsigned int de 2 bytes cada uno
+                    var MajYMin = new Uint16Array(bufferDeSoloMajYMin);
+                    
+                    //El primer elemento del array es el major y el segundo el minor
+                    var elMajor = MajYMin[0].toString();
+                    var elMinor = MajYMin[1].toString();
                     this.obtenerCO(elMajor, elMinor);
                 }
             });
     }
 
+
     obtenerCO(elMajor: string, elMinor: string) {
         //Aquí haremos algo con el major y el minor
-        this.guardarCO("major: " + elMajor + ", minor: " + elMinor);
+        //En este caso tratamos el major y el minor como números y por lo tanto, sabiendo que las primeras dos cifras del major
+        // son la temperatura, las dos ultimas la humedad y que el minor es la medida de ppb de CO, obtenemos los valores de la siguiente manera:
+        var temp = Math.floor(+elMajor / 100);
+        var hum = +elMajor - temp*100;
+        var ppb = +elMinor;
+        this.guardarCO("temperatura: " + temp + ", humedad: " + hum + ", ppb: "+ ppb);
     }
-    /*
-    suscribirse() {
+   
 
-
-
-       this.btle.subscribe('\n').subscribe(res => {
-           var dato: string = JSON.stringify(res);
-           if (dato.toString().includes("Victor")) {
-               this.guardarCO(dato);
-           }
-        }, err => { throw(err)});
-    }
-    */
-    /*función comprobante que se llama a sí misma cada medio segundo y se suscribe si el bt esá activo y el dispositivo está conectado
-    conectarse(id: string) {
-        this.ble.autoConnect(id, () => { this.suscribirse() }, () => { })
-    }
-    */
-    //scan devices comprueba si el bt está activado, si lo está comprueba si está conectado, si lo está se suscribe, si no lo está muestra
-    //las opciones de bt y llama a la función comprobante conectarse
     encenderBT() {
        this.ble.isEnabled().then(() => {
            console.log("bluetooth is enabled all G");
@@ -74,6 +66,8 @@ export class ServicioFirebaseService {
         });
        
     }
+
+
     async getPosicion(lat:any, long:any) {
         this.geolocation.watchPosition().subscribe(posi => {
             lat = posi.coords.latitude.toString();
@@ -84,6 +78,9 @@ export class ServicioFirebaseService {
             // Other info you want to add here
         })
     }
+
+
+
     guardarCO(data: string) {
         var now = new Date().getTime().toString();
         var lat = "";
