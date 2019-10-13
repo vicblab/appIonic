@@ -9,7 +9,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 //import { BluetoothSerial } from '@ionic-native/bluetooth-serial/ngx';
 
-const laUuid: string = "C2:B6:F0:AA:D3:EF";
+const laUuid: string = "EPSG-GTI-PROY-3A";
 
 
 @Component({
@@ -38,12 +38,12 @@ export class Tab2Page {
    
 
     discover() {
-       /* this.ble.scan([], 15).subscribe(
+      /* this.ble.scan([], 15).subscribe(
             device => {
                 //String.fromCharCode.apply(null, new Uint8Array(device.advertising))
-                var buffer=device.advertising.slice(25, 29);
+                var buffer=device.advertising.slice(9, 25);
 
-                var adData = new Uint16Array(buffer);
+                var adData = String.fromCharCode.apply(null, new Uint8Array(buffer));
                
                 device.advertising = adData.toString();
                 

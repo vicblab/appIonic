@@ -1,3 +1,12 @@
+// -------------------------------------------
+// ReceptorBLE.ts
+// Servicio encargado de recibir las tramas del beacon BLE y 
+// enviar los datos de CO encapsulados en ellas junto con info adicional a firestore
+// equipo 5
+// autor: Víctor Blanco Bataller
+// 13/10/2019
+// copyright
+// -------------------------------------------
 import { Injectable } from '@angular/core';
 
 import {  AngularFirestore } from 'angularfire2/firestore';
@@ -26,11 +35,16 @@ export class ServicioFirebaseService {
     }
     
 
-
-    obtenerMisTramas(id:string) {
+    // -------------------------------------------
+// uuid: texto -> obtenerMisTramas() -> ()
+    // Método que se encarga de captar las tramas de todos los beacon cercanos y hacer un filtrado 
+    // para solo actuar si una trama contiene nuestra uuid
+// -------------------------------------------
+    obtenerMisTramas(uuid:string) {
         this.ble.scan([], 14).subscribe(
             device => {
-                if (device.id == id) {
+                //compruebo si la uuid del advertising es mi uuid
+                if (String.fromCharCode.apply(null, new Uint8Array(device.advertising.slice(9, 25))).toString() == uuid) {
                     //obtengo un nuevo buffer que solo contenga los dos bytes del major y minor a partir del buffer de advertising data
                     var bufferDeSoloMajYMin = device.advertising.slice(25, 29);
                     //convierto el buffer en una lista de dos unsigned int de 2 bytes cada uno
@@ -42,7 +56,7 @@ export class ServicioFirebaseService {
                     this.obtenerCO(elMajor, elMinor);
                 }
             });
-    }
+    }//obtenerMisTramas()
 
 
     obtenerCO(elMajor: string, elMinor: string) {
