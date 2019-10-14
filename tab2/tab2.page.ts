@@ -5,7 +5,7 @@ import { ServicioFirebaseService } from '../ReceptorBLE'
 //import { BluetoothSerial } from '@ionic-native/bluetooth-serial/ngx';
 import { ToastController } from '@ionic/angular';
 import { BLE } from '@ionic-native/ble/ngx';
-import { Geolocation } from '@ionic-native/geolocation/ngx';
+
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 //import { BluetoothSerial } from '@ionic-native/bluetooth-serial/ngx';
 
@@ -27,9 +27,9 @@ export class Tab2Page {
     miLista: string="hola";
    
     service: ServicioFirebaseService;
-    constructor(private fireStore: AngularFirestore, public toastController: ToastController, private ble: BLE, private ngZone: NgZone, private geolocation: Geolocation, private permissions: AndroidPermissions) {
+    constructor(private fireStore: AngularFirestore, public toastController: ToastController, private ble: BLE, private ngZone: NgZone, private permissions: AndroidPermissions) {
 
-        this.service = new ServicioFirebaseService(fireStore, ble, geolocation);
+        this.service = new ServicioFirebaseService(fireStore, ble);
        // this.text = "hello darkness";
     }
     ab2str(buf) {
@@ -53,8 +53,8 @@ export class Tab2Page {
                     this.devices.push(err)
                 }
             });*/
-       
-      
+
+        this.service.funcionDepruebaParaImprimirEnPantalla((res) => { this.onDeviceDiscovered(res); });
         //this.service.obtenerMisTramas(laUuid);
        
     }

@@ -13,24 +13,39 @@ import {  AngularFirestore } from 'angularfire2/firestore';
 
 import { BLE } from '@ionic-native/ble/ngx';
 //import { BluetoothSerial } from '@ionic-native/bluetooth-serial/ngx';
-import { Geolocation } from '@ionic-native/geolocation/ngx';
-import { Tab2Page } from './tab2/tab2.page';
+
+
+import { LocalizadorGPSService } from './LocalizadorGPS';
+import { LaLogicaService } from './LaLogica';
 //import { setTimeout } from 'timers';
 
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
+
 })
 export class ServicioFirebaseService {
  
     
-    Collection;
+    //Collection;
+    private uuid = "EPSG-GTI-PROY-3A";
+    private medicion;
+    private posicion;
+    private momento;
+    private miLocalizador;
+    private miLogica;
 
-    constructor(private fireStore: AngularFirestore,private ble: BLE,  private geolocation: Geolocation) {
-        this.Collection = fireStore.collection<any>('data');
-        console.log(this.Collection);
+    constructor(private fireStore: AngularFirestore, private ble: BLE) {
+
+        
+        this.medicion = { CO: -1, humedad: -1, temperatura: -1 };
+        this.posicion = { latitud: "", longitud: "", altitud: "" };
+        this.momento=-1;
+        //this.Collection = fireStore.collection<any>('data');
+        //console.log(this.Collection);
         this.encenderBT();
-       
+        this.miLocalizador = new LocalizadorGPSService();
+        this.miLogica = new LaLogicaService(this.fireStore);
       
     }
     
@@ -40,11 +55,23 @@ export class ServicioFirebaseService {
     // Método que se encarga de captar las tramas de todos los beacon cercanos y hacer un filtrado 
     // para solo actuar si una trama contiene nuestra uuid
 // -------------------------------------------
-    obtenerMisTramas(uuid:string) {
-        this.ble.scan([], 14).subscribe(
+
+    obtenerMisTramas(callback) { // callback
+
+        /*Function scan scans for BLE devices.The success callback is called each time a peripheral is discovered.
+         * Scanning automatically stops after the specified number of seconds.
+
+        {
+            "name": "TI SensorTag",
+                "id": "BD922605-1B07-4D55-8D09-B66653E51BBA",
+                    "rssi": -79,
+                        "advertising": ArrayBuffer or map 
+        }*/
+
+        this.ble.scan([], 5).subscribe(
             device => {
                 //compruebo si la uuid del advertising es mi uuid
-                if (String.fromCharCode.apply(null, new Uint8Array(device.advertising.slice(9, 25))).toString() == uuid) {
+                if (String.fromCharCode.apply(null, new Uint8Array(device.advertising.slice(9, 25))).toString() == this.uuid) {
                     //obtengo un nuevo buffer que solo contenga los dos bytes del major y minor a partir del buffer de advertising data
                     var bufferDeSoloMajYMin = device.advertising.slice(25, 29);
                     //convierto el buffer en una lista de dos unsigned int de 2 bytes cada uno
@@ -53,22 +80,73 @@ export class ServicioFirebaseService {
                     //El primer elemento del array es el major y el segundo el minor
                     var elMajor = MajYMin[0].toString();
                     var elMinor = MajYMin[1].toString();
-                    this.obtenerCO(elMajor, elMinor);
+
+                    //Aquí haremos algo con el major y el minor
+        //En este caso tratamos el major y el minor como números y por lo tanto, sabiendo que las primeras dos cifras del major
+        // son la temperatura, las dos ultimas la humedad y que el minor es la medida de ppb de CO, obtenemos los valores de la siguiente manera:
+                    this.medicion.temperatura = Math.floor(+elMajor / 100);
+                    this.medicion.humedad = +elMajor - this.medicion.temperatura * 100;
+                    this.medicion.CO = +elMinor;
+                    callback();
+
+                    //this.obtenerCO(elMajor, elMinor);
+                    // elMajor i elMinor -> CO y guardar en var. global
+                    // en var global <- pos gps, temps
+                    // callback( null )
                 }
+                //comentar tras las pruebas
+                callback();
             });
     }//obtenerMisTramas()
 
+ 
+    //  
+    // obtenerCO <-
+    // co:R, t:N, pos:Posicion
+    //
+    actualizarMediciones(callback) {  // callback
 
-    obtenerCO(elMajor: string, elMinor: string) {
-        //Aquí haremos algo con el major y el minor
-        //En este caso tratamos el major y el minor como números y por lo tanto, sabiendo que las primeras dos cifras del major
-        // son la temperatura, las dos ultimas la humedad y que el minor es la medida de ppb de CO, obtenemos los valores de la siguiente manera:
-        var temp = Math.floor(+elMajor / 100);
-        var hum = +elMajor - temp*100;
-        var ppb = +elMinor;
-        this.guardarCO("temperatura: " + temp + ", humedad: " + hum + ", ppb: "+ ppb);
+        
+
+
+        this.obtenerMisTramas(() => {
+            this.momento = new Date().getTime();
+            this.miLocalizador.obtenerMiPosicion((res, err) => {
+                if (!err) {
+                    this.posicion = res;
+                    callback();
+                } else {
+                    
+                    throw err;
+                } //pequeño control de errores
+            })//obtenerMiPosicion()
+           
+        })//obtenerMisTramas()
+       
+        //this.guardarCO("temperatura: " + temp + ", humedad: " + hum + ", ppb: "+ ppb);
     }
-   
+
+        //  
+    // obtenerCO <-
+    // co:R, t:N, pos:Posicion
+    //
+    obtenerCO(callback) {
+
+        this.actualizarMediciones(() => {
+            var jsonConTodo = { datosMedida: this.medicion, posicion: this.posicion, hora: this.momento };
+            callback(JSON.stringify(jsonConTodo));//devuelvo los datos parseados en un JSON hecho texto 
+        }
+        );//actualizarMediciones
+
+    }
+
+    hayQueActualizarMedicionesYEnviarlasAlServidor() {
+        this.obtenerCO((todosLosDatos) => { this.miLogica.guardarCO(todosLosDatos) });
+    }
+
+    funcionDepruebaParaImprimirEnPantalla(callback) {
+        this.obtenerCO((todosLosDatos) => { callback(todosLosDatos); });
+    }
 
     encenderBT() {
        this.ble.isEnabled().then(() => {
@@ -82,33 +160,6 @@ export class ServicioFirebaseService {
     }
 
 
-    async getPosicion(lat:any, long:any) {
-        this.geolocation.watchPosition().subscribe(posi => {
-            lat = posi.coords.latitude.toString();
-            long = posi.coords.longitude.toString();
-            // alt = posi.coords.altitude.toString();
-        }, err => {
-            //   Tab2Page.prototype.presentToast("aaaaaaaaaaaaa");
-            // Other info you want to add here
-        })
-    }
 
 
-
-    guardarCO(data: string) {
-        var now = new Date().getTime().toString();
-        var lat = "";
-        var long = "";
-        var alt = "";
-        
-            this.Collection.add({
-                location: 'Latitud: ' + lat + ', Longitud: ' +long + 'Altitud: ' + alt,
-                date: now,
-                measurement: data,
-                // Other info you want to add here
-            })
-            
-     
-        
-    }
 }

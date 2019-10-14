@@ -7,39 +7,97 @@
 // copyright
 // -------------------------------------------
 import { Injectable } from '@angular/core';
-import { Geolocation } from '@ionic-native/geolocation/ngx';
+
+declare var AdvancedGeolocation: any;
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class LocalizadorGPSService {
     private ultimaPosicionMedida;
     ;
-    
-    constructor(private geolocation: Geolocation) {
+
+    constructor() {
         this.ultimaPosicionMedida = { latitud: "", longitud: "", altitud: "" };
 
     }
 
     // -------------------------------------------
-// -> obtenerMiPosicion() -> Posicion()
+    // -> obtenerMiPosicion() -> Posicion()
     // Método que se encarga de obtener mi posición 
-    
-// -------------------------------------------
 
-    obtenerMiPosicion() {
-        this.geolocation.watchPosition().subscribe(posi => {
+    // -------------------------------------------
 
-            var lat = posi.coords.latitude.toString();
-            var long= posi.coords.longitude.toString();
-            var alt = posi.coords.altitude.toString();
-            var Pos = { latitud: lat, longitud: long, altitud: alt };
-          
+    obtenerMiPosicion(callback) {
 
-            return Pos;
-        }, err => {
-            return this.ultimaPosicionMedida;
-        })
+        //--------------------------------------------------------------------------
+        AdvancedGeolocation.start((success) => {
+            //loading.dismiss();
+            // this.refreshCurrentUserLocation();
+            try {
+                var jsonObject = JSON.parse(success);
+                console.log("Provider " + JSON.stringify(jsonObject));
+                switch (jsonObject.provider) {
+                    case "gps":
+                        console.log("setting gps ====<<>>" + jsonObject.latitude);
+                        var lat = jsonObject.latitude.toString();
+                        var long = jsonObject.longitude.toString();
+                     
+                        var Pos = { latitud: lat, longitud: long, altitud: "" };
+                        callback(Pos, null);
+                        break;
+
+                    case "network":
+                        console.log("setting network ====<<>>" + jsonObject.latitude);
+
+                        var lat = jsonObject.latitude.toString();
+                        var long = jsonObject.longitude.toString();
+
+                        var Pos = { latitud: lat, longitud: long, altitud: "" };
+                        callback(Pos, null);
+
+                        break;
+
+                    case "satellite":
+                        //TODO
+                        break;
+
+                    case "cell_info":
+                        //TODO
+                        break;
+
+                    case "cell_location":
+                        //TODO
+                        break;
+
+                    case "signal_strength":
+                        //TODO
+                        break;
+                }
+            }
+            catch (exc) {
+                console.log("Invalid JSON: " + exc);
+            }
+        },
+            function (error) {
+                console.log("ERROR! " + JSON.stringify(error));
+            },
+            {
+                "minTime": 500,         // Min time interval between updates (ms)
+                "minDistance": 1,       // Min distance between updates (meters)
+                "noWarn": true,         // Native location provider warnings
+                "providers": "all",     // Return GPS, NETWORK and CELL locations
+                "useCache": true,       // Return GPS and NETWORK cached locations
+                "satelliteData": false, // Return of GPS satellite info
+                "buffer": false,        // Buffer location data
+                "bufferSize": 0,         // Max elements in buffer
+                "signalStrength": false // Return cell signal strength data
+            });
+
+   //-------------------------------------------------------------------------
+        
+
+   
     }//obtenerMiPosicion()
 
        // -------------------------------------------
@@ -49,14 +107,19 @@ export class LocalizadorGPSService {
     //3. Si es true, actualizar ultimaPosicion
 
 // -------------------------------------------
-    meHeMovido() {
-        var posicionAuxiliar = this.obtenerMiPosicion();
+    meHeMovido(callback) {
 
-        if (this.ultimaPosicionMedida != posicionAuxiliar) {
-            this.ultimaPosicionMedida = posicionAuxiliar;
-            return true;
-        }
-        return false;
+   this.obtenerMiPosicion(function (res, err) {
+            
+                if (this.ultimaPosicionMedida != res) {
+                    this.ultimaPosicionMedida = res;
+                    callback(true,err);
+                }
+                callback(false,err);
+            
+        });
+
+       
     }
 
 }

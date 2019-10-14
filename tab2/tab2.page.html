@@ -13,10 +13,8 @@
 <ion-content>
     <ion-list>
         <ion-card-content ion-item *ngFor="let device of devices">
-            <p>{{device.name || 'Unnamed'}}</p>
-            <p>{{device.id||device}}</p>
-            <p>RSSI: {{device.rssi}}</p>
-            <p>Data: {{device.advertising}}</p>
+            <p>{{device}}</p>
+           
         </ion-card-content>
     </ion-list>
     </ion-content>
