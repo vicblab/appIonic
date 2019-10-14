@@ -55,7 +55,7 @@ export class Tab2Page {
             });*/
        
       
-        this.service.obtenerMisTramas(laUuid);
+        //this.service.obtenerMisTramas(laUuid);
        
     }
     
