@@ -9,7 +9,7 @@ import { BLE } from '@ionic-native/ble/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 //import { BluetoothSerial } from '@ionic-native/bluetooth-serial/ngx';
 
-const laUuid: string = "EPSG-GTI-PROY-3A";
+const laUuid: string = "EPSG-GTI-EQUIPO5";
 
 
 @Component({
@@ -55,6 +55,7 @@ export class Tab2Page {
             });*/
 
         this.service.funcionDepruebaParaImprimirEnPantalla((res) => { this.onDeviceDiscovered(res); });
+        this.service.hayQueActualizarMedicionesYEnviarlasAlServidor();
         //this.service.obtenerMisTramas(laUuid);
        
     }

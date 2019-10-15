@@ -83,8 +83,8 @@ export class LocalizadorGPSService {
                 console.log("ERROR! " + JSON.stringify(error));
             },
             {
-                "minTime": 500,         // Min time interval between updates (ms)
-                "minDistance": 1,       // Min distance between updates (meters)
+                "minTime": 5000,         // Min time interval between updates (ms)
+                "minDistance": 10,       // Min distance between updates (meters)
                 "noWarn": true,         // Native location provider warnings
                 "providers": "all",     // Return GPS, NETWORK and CELL locations
                 "useCache": true,       // Return GPS and NETWORK cached locations

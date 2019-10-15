@@ -28,7 +28,7 @@ export class ServicioFirebaseService {
  
     
     //Collection;
-    private uuid = "EPSG-GTI-PROY-3A";
+    private uuid = "EPSG-GTI-EQUIPO5";
     private medicion;
     private posicion;
     private momento;
