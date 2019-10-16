@@ -19,6 +19,7 @@ export class LaLogicaService {
             location: JSON.stringify(jsonFuncional.posicion),
             date: jsonFuncional.hora.toString(),
             measurement: JSON.stringify(jsonFuncional.datosMedida),
+           // valid: "yes"
             // Other info you want to add here
         })
 

@@ -1,15 +1,13 @@
 import { Component, NgZone } from '@angular/core';
 //import { Tab2PageModule } from './tab2.module'
-import { AngularFirestore } from 'angularfire2/firestore';
+
 import { ServicioFirebaseService } from '../ReceptorBLE'
 //import { BluetoothSerial } from '@ionic-native/bluetooth-serial/ngx';
 import { ToastController } from '@ionic/angular';
-import { BLE } from '@ionic-native/ble/ngx';
 
-import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 //import { BluetoothSerial } from '@ionic-native/bluetooth-serial/ngx';
 
-const laUuid: string = "EPSG-GTI-EQUIPO5";
+
 
 
 @Component({
@@ -26,15 +24,13 @@ export class Tab2Page {
     arr: Array<string> = ["este es de prueba"];
     miLista: string="hola";
    
-    service: ServicioFirebaseService;
-    constructor(private fireStore: AngularFirestore, public toastController: ToastController, private ble: BLE, private ngZone: NgZone, private permissions: AndroidPermissions) {
+    
+    constructor(public service: ServicioFirebaseService, public toastController: ToastController, private ngZone: NgZone) {
 
-        this.service = new ServicioFirebaseService(fireStore, ble);
+       // this.service = new ServicioFirebaseService(fireStore, ble);
        // this.text = "hello darkness";
     }
-    ab2str(buf) {
-    return String.fromCharCode.apply(null, new Uint8Array(buf));
-}
+   
    
 
     discover() {
@@ -54,9 +50,10 @@ export class Tab2Page {
                 }
             });*/
 
-        this.service.funcionDepruebaParaImprimirEnPantalla((res) => { this.onDeviceDiscovered(res); });
+       // this.service.funcionDepruebaParaImprimirEnPantalla((res) => { this.onDeviceDiscovered(res); });
+       // this.service.AlarmaQueSuenaCadaMinuto();
         this.service.hayQueActualizarMedicionesYEnviarlasAlServidor();
-        //this.service.obtenerMisTramas(laUuid);
+       
        
     }
     

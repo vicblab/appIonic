@@ -7,4 +7,13 @@
     </ion-toolbar>
 </ion-header>
 
-<ion-content></ion-content>
+<ion-content>
+    <ion-list>
+        <ion-card-content ion-item *ngFor="let dato of datos">
+            <p>Fecha epoch: {{dato.date}}</p>
+            <p>Posicion: {{dato.location}}</p>
+            <p>Medida: {{dato.measurement}}</p>
+           
+        </ion-card-content>
+    </ion-list>
+</ion-content>

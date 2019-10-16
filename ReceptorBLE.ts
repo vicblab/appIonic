@@ -34,7 +34,9 @@ export class ServicioFirebaseService {
     private momento;
     private miLocalizador;
     private miLogica;
-
+    private minuto: number = 0;
+    private maxMinuto: number = 30;
+    private noLlamarMas = false;
     constructor(private fireStore: AngularFirestore, private ble: BLE) {
 
         
@@ -134,20 +136,61 @@ export class ServicioFirebaseService {
 
         this.actualizarMediciones(() => {
             var jsonConTodo = { datosMedida: this.medicion, posicion: this.posicion, hora: this.momento };
+           
             callback(JSON.stringify(jsonConTodo));//devuelvo los datos parseados en un JSON hecho texto 
+            
         }
         );//actualizarMediciones
 
     }
 
     hayQueActualizarMedicionesYEnviarlasAlServidor() {
-        this.obtenerCO((todosLosDatos) => { this.miLogica.guardarCO(todosLosDatos) });
+        this.noLlamarMas = false;
+        this.obtenerCO((todosLosDatos) => {
+            if (!this.noLlamarMas) {
+                this.miLogica.guardarCO(todosLosDatos)
+                this.noLlamarMas = true;
+            }
+        });
+       
     }
 
     funcionDepruebaParaImprimirEnPantalla(callback) {
         this.obtenerCO((todosLosDatos) => { callback(todosLosDatos); });
     }
 
+  
+
+    AlarmaQueSuenaCadaMinuto() {
+        setTimeout(x => {
+            if (this.minuto <= 0) {
+                this.noLlamarMas = false;
+                this.miLocalizador.meHeMovido((res, err) => {
+                    if (!err) {
+                        if (res) {
+                            this.hayQueActualizarMedicionesYEnviarlasAlServidor();
+                            this.noLlamarMas = true;
+                        }
+                    } else {
+                        throw err;
+                    }
+                    })
+
+                this.minuto = this.maxMinuto
+            }
+            this.minuto -= 1;
+
+            if (this.minuto > 0) {
+                
+                this.AlarmaQueSuenaCadaMinuto();
+            }
+
+            
+
+        }, 1000);
+
+
+    }
     encenderBT() {
        this.ble.isEnabled().then(() => {
            console.log("bluetooth is enabled all G");

@@ -15,7 +15,7 @@ declare var AdvancedGeolocation: any;
 })
 export class LocalizadorGPSService {
     private ultimaPosicionMedida;
-    ;
+    private 
 
     constructor() {
         this.ultimaPosicionMedida = { latitud: "", longitud: "", altitud: "" };
@@ -36,24 +36,21 @@ export class LocalizadorGPSService {
             // this.refreshCurrentUserLocation();
             try {
                 var jsonObject = JSON.parse(success);
+                var lat = jsonObject.latitude.toString();
+                var long = jsonObject.longitude.toString();
+                var alt = jsonObject.altitude.toString();
+                var Pos = { latitud: lat, longitud: long, altitud: alt };
                 console.log("Provider " + JSON.stringify(jsonObject));
                 switch (jsonObject.provider) {
                     case "gps":
                         console.log("setting gps ====<<>>" + jsonObject.latitude);
-                        var lat = jsonObject.latitude.toString();
-                        var long = jsonObject.longitude.toString();
-                     
-                        var Pos = { latitud: lat, longitud: long, altitud: "" };
+                      
                         callback(Pos, null);
                         break;
 
                     case "network":
                         console.log("setting network ====<<>>" + jsonObject.latitude);
 
-                        var lat = jsonObject.latitude.toString();
-                        var long = jsonObject.longitude.toString();
-
-                        var Pos = { latitud: lat, longitud: long, altitud: "" };
                         callback(Pos, null);
 
                         break;
