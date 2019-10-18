@@ -3,7 +3,7 @@
 // Servicio encargado de recibir las tramas del beacon BLE y 
 // enviar los datos de CO encapsulados en ellas junto con info adicional a firestore
 // equipo 5
-// autor: Víctor Blanco Bataller
+// autor: VÃ­ctor Blanco Bataller
 // 13/10/2019
 // copyright
 // -------------------------------------------
@@ -37,6 +37,8 @@ export class ServicioFirebaseService {
     private minuto: number = 0;
     private maxMinuto: number = 30;
     private noLlamarMas = false;
+    
+    //Constructor
     constructor(private fireStore: AngularFirestore, private ble: BLE) {
 
         
@@ -54,7 +56,7 @@ export class ServicioFirebaseService {
 
     // -------------------------------------------
 // uuid: texto -> obtenerMisTramas() -> ()
-    // Método que se encarga de captar las tramas de todos los beacon cercanos y hacer un filtrado 
+    // MÃ©todo que se encarga de captar las tramas de todos los beacon cercanos y hacer un filtrado 
     // para solo actuar si una trama contiene nuestra uuid
 // -------------------------------------------
 
@@ -83,8 +85,8 @@ export class ServicioFirebaseService {
                     var elMajor = MajYMin[0].toString();
                     var elMinor = MajYMin[1].toString();
 
-                    //Aquí haremos algo con el major y el minor
-        //En este caso tratamos el major y el minor como números y por lo tanto, sabiendo que las primeras dos cifras del major
+                    //AquÃ­ haremos algo con el major y el minor
+        //En este caso tratamos el major y el minor como nÃºmeros y por lo tanto, sabiendo que las primeras dos cifras del major
         // son la temperatura, las dos ultimas la humedad y que el minor es la medida de ppb de CO, obtenemos los valores de la siguiente manera:
                     this.medicion.temperatura = Math.floor(+elMajor / 100);
                     this.medicion.humedad = +elMajor - this.medicion.temperatura * 100;
@@ -103,8 +105,8 @@ export class ServicioFirebaseService {
 
  
     //  
-    // obtenerCO <-
-    // co:R, t:N, pos:Posicion
+    // actualizarMediciones() <-
+    //  pos:Posicion
     //
     actualizarMediciones(callback) {  // callback
 
@@ -120,7 +122,7 @@ export class ServicioFirebaseService {
                 } else {
                     
                     throw err;
-                } //pequeño control de errores
+                } //pequeÃ±o control de errores
             })//obtenerMiPosicion()
            
         })//obtenerMisTramas()
@@ -128,6 +130,7 @@ export class ServicioFirebaseService {
         //this.guardarCO("temperatura: " + temp + ", humedad: " + hum + ", ppb: "+ ppb);
     }
 
+    
         //  
     // obtenerCO <-
     // co:R, t:N, pos:Posicion
@@ -143,6 +146,10 @@ export class ServicioFirebaseService {
         );//actualizarMediciones
 
     }
+    
+    //--------------------------------------
+   // ()--> hayQueActualizarMedicionesYEnviarlasAlServidor()-->
+    //---------------------------------------------
 
     hayQueActualizarMedicionesYEnviarlasAlServidor() {
         this.noLlamarMas = false;
@@ -155,9 +162,9 @@ export class ServicioFirebaseService {
        
     }
 
-    funcionDepruebaParaImprimirEnPantalla(callback) {
+   /* funcionDepruebaParaImprimirEnPantalla(callback) {
         this.obtenerCO((todosLosDatos) => { callback(todosLosDatos); });
-    }
+    }*/
 
   
 
@@ -191,6 +198,11 @@ export class ServicioFirebaseService {
 
 
     }
+    
+    //-------------------------------------------
+    //EncenderBT()
+    //Enciende el BT si no estÃ¡ encendido pidiendo permiso
+    //-------------------------------
     encenderBT() {
        this.ble.isEnabled().then(() => {
            console.log("bluetooth is enabled all G");
