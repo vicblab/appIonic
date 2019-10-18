@@ -12,10 +12,10 @@ import { ServicioFirebaseService } from './ReceptorBLE';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { firebaseConfig } from './credentials';
-import { BluetoothSerial } from '@ionic-native/bluetooth-serial/ngx';
+//import { BluetoothSerial } from '@ionic-native/bluetooth-serial/ngx';
 import { BLE } from '@ionic-native/ble/ngx';
-import { Geolocation } from '@ionic-native/geolocation/ngx';
-import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
+//import { Geolocation } from '@ionic-native/geolocation/ngx';
+//import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 
 
 @NgModule({
@@ -25,11 +25,11 @@ import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
   providers: [
     StatusBar,
       SplashScreen,
-      BluetoothSerial,
+      //BluetoothSerial,
       ServicioFirebaseService,
       BLE,
-      Geolocation,
-      AndroidPermissions,
+      //Geolocation,
+      //AndroidPermissions,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]
