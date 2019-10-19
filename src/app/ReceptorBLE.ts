@@ -12,7 +12,7 @@ import { Injectable } from '@angular/core';
 import {  AngularFirestore } from 'angularfire2/firestore';
 
 import * as ngx from '@ionic-native/ble/ngx';
-
+import { Platform } from '@ionic/angular';
 
 import { interval } from 'rxjs'
 import { LocalizadorGPSService } from './LocalizadorGPS';
@@ -27,23 +27,39 @@ import { Subscription } from 'rxjs';
 })
 export class ServicioFirebaseService {
  
+    //--------------------------------------
+    // Alarmas de la app que disparan los servicios necesarios:
+
+    //--------------------------------------
+    // alarmaQueSuenaCadaMinuto()
+    //alarma que suena cada ciertos milisegundos marcados por la variable "minuto" y llama al método del localizador
+    // meHeMovido, de manera que si devuelve true llama a hayQueActualizarMedicionesYEnviarlasAlServidor()
+    //-----------------------------------------
     private alarmaQueSuenaCadaMinuto: Subscription;
+    //--------------------------------------
+    // alarmaQueSuenaCadaMinuto()
+    //alarma que suena cada ciertos milisegundos marcados por la variable "diezMinutos" 
+    //y llama a hayQueActualizarMedicionesYEnviarlasAlServidor()
+    //-----------------------------------------
     private alarmaQueSuenaCadaDiezMinutos: Subscription;
-    //Collection;
+    //---------------------------------------------------------
+    
+    //mi uuid:
     private uuid = "EPSG-GTI-EQUIPO5";
     private medicion;
     private posicion;
     private momento;
-    private miLocalizador;
+   
     private miLogica;
     
     private minuto: number = 5000;
-    private diezMinutos: number=20000;
+    private diezMinutos: number=10000;
     private noLlamarMas = false;
     
     //Constructor
-    constructor(private fireStore: AngularFirestore, private ble: ngx.BLE) {
-
+    constructor(  private miLocalizador:LocalizadorGPSService, private fireStore: AngularFirestore, private ble: ngx.BLE, private platform: Platform) {
+     if(platform.is('cordova')){
+        //this.miLocalizador = new LocalizadorGPSService(platform);
       
     this.alarmaQueSuenaCadaDiezMinutos = interval(this.diezMinutos)
     .subscribe((val) => { 
@@ -51,19 +67,16 @@ export class ServicioFirebaseService {
     });
     this.alarmaQueSuenaCadaMinuto = interval(this.minuto)
     .subscribe((val) => {
-         if(this.miLocalizador.meHeMovido()){
-             this.hayQueActualizarMedicionesYEnviarlasAlServidor();
-         }
+         miLocalizador.meHeMovido((loHeHecho,err)=>{if(loHeHecho)this.hayQueActualizarMedicionesYEnviarlasAlServidor() })
         });
     this.medicion = { CO: -1, humedad: -1, temperatura: -1 };
         this.posicion = { latitud: "", longitud: "", altitud: "" };
         this.momento=-1;
-        //this.Collection = fireStore.collection<any>('data');
-        //console.log(this.Collection);
+       
         this.encenderBT();
-        this.miLocalizador = new LocalizadorGPSService();
-        this.miLogica = new LaLogicaService(this.fireStore);
       
+        this.miLogica = new LaLogicaService(this.fireStore);
+    }
     }
     
 
@@ -178,10 +191,7 @@ export class ServicioFirebaseService {
        
     }
 
-    funcionDepruebaParaImprimirEnPantalla(callback) {
-        this.obtenerCO((todosLosDatos) => { callback(todosLosDatos); });
-      
-    }
+ 
 
   
     

@@ -1,13 +1,21 @@
-import { Component, NgZone } from '@angular/core';
-//import { Tab2PageModule } from './tab2.module'
+// -------------------------------------------
+// tab2.page.ts
+// controla lo que se muestra en el tab 2 
+// equipo 5
+// autor: V�ctor Blanco Bataller
+// 19/10/2019
+// copyright
+// -------------------------------------------
+import { Component, NgZone, ViewChild } from '@angular/core';
+
 
 import { ServicioFirebaseService } from '../ReceptorBLE'
-//import { BluetoothSerial } from '@ionic-native/bluetooth-serial/ngx';
+
 import { ToastController } from '@ionic/angular';
 import { BLE } from '@ionic-native/ble/ngx';
-//import { BluetoothSerial } from '@ionic-native/bluetooth-serial/ngx';
-import {  AngularFirestore } from 'angularfire2/firestore';
 
+import {  AngularFirestore } from 'angularfire2/firestore';
+import{IonContent} from '@ionic/angular'
 
 
 @Component({
@@ -19,7 +27,7 @@ import {  AngularFirestore } from 'angularfire2/firestore';
 
 
 export class Tab2Page {
-    
+    @ViewChild(IonContent,{static:false}) content: IonContent;
     devices: any[] = [];
   
     
@@ -27,21 +35,50 @@ export class Tab2Page {
     
     constructor(private fireStore:AngularFirestore, private ble: BLE,  public toastController: ToastController, private ngZone: NgZone) {
 
-        //this.service = new ServicioFirebaseService(fireStore, ble);
-       // this.text = "hello darkness";
     }
    
    
+ //-------------------------------
+ // irAbajo()
+ // método que hace scroll hacia abajo en la página/app
+ //-----------------------------------------
+    irAbajo(){
+        
+        this.content.scrollToBottom(1000);
+    }
 
+    //-------------------------------
+ // irArriba()
+ // método que hace scroll hacia arriba en la página/app
+ //-----------------------------------------
+    irArriba(){
+        this.content.scrollToTop(1000); 
+    }
+
+    //--------------------------------------------
+    // discover()
+    // método que descubre los dispositivos BLE cercanos y si detecta el nuestro cambia su advertising por su uuid, major y minor parseados
+    //-----------------------------------------
     discover() {
        this.ble.scan([], 15).subscribe(
             device => {
-                
-                //String.fromCharCode.apply(null, new Uint8Array(device.advertising))
-                var buffer=device.advertising.slice(9, 25);
+               if (String.fromCharCode.apply(null, new Uint8Array(device.advertising.slice(9, 25))).toString() == "EPSG-GTI-EQUIPO5") {
+                 //obtengo un nuevo buffer que solo contenga los dos bytes del major y minor a partir del buffer de advertising data
+                 var bufferDeSoloMajYMin = device.advertising.slice(25, 29);
+                 //convierto el buffer en una lista de dos unsigned int de 2 bytes cada uno
+                 var MajYMin = new Uint16Array(bufferDeSoloMajYMin);
+                device.advertising= "UUID: "+
+                String.fromCharCode.apply(null, new Uint8Array(device.advertising.slice(9, 25))).toString() 
+                +"MAJOR: "+MajYMin[0].toString()
+                "MINOR: "+MajYMin[1].toString()+
+                +"\n, ESTE ES MI DISPOSITIVO ^";
+                     this.presentToast("¡¡EL DISPOSITIVO ESTÁ CERCA!!");
+                     this.onDeviceDiscovered(device);
 
-                var adData = new Uint8Array(device.advertising);//String.fromCharCode.apply(null, new Uint8Array(buffer));
-               
+            }     else{     
+                
+
+                var adData = new Uint8Array(device.advertising);
                 device.advertising = adData.toString();
                 
                 this.onDeviceDiscovered(device);
@@ -49,15 +86,15 @@ export class Tab2Page {
                 err => {
                     this.devices.push(err)
                 }
+            }
             });
-console.log("hola");
-        //this.service.hayQueActualizarMedicionesYEnviarlasAlServidor((res) => { this.presentToast("Has enviado: "+res); });
-       // this.service.AlarmaQueSuenaCadaMinuto();
-        //this.service.hayQueActualizarMedicionesYEnviarlasAlServidor();
-       
-       
-    }
+                
+    }//discover()
     
+    //-----------------------------------------------
+    // onDeviceDiscovered()
+    // Método que guarda el dispositivo descubierto en una lista para que se pueda mostrar en pantalla
+    //------------------------------------------------
     onDeviceDiscovered(device) {
         console.log('Discovered' + JSON.stringify(device, null, 2));
         this.ngZone.run(() => {
@@ -66,7 +103,10 @@ console.log("hola");
         })
     }
     
-
+    //-------------------------------------------------------
+    // texto-->presentToast()
+    // método que muestra texto mediante un toast
+    //--------------------------------------------------
     public async presentToast(texto:string) {
         const toast = await this.toastController.create({
             message: texto,

@@ -1,29 +1,48 @@
 <ion-header>
     <ion-toolbar>
         <ion-title>
-            Tab Three
+            Datos recibidos
         </ion-title>
-        
+        <ion-button (click)="irAbajo()" slot="end" color="success">
+               
+                <p>Ir abajo</p>
+            </ion-button>
     </ion-toolbar>
 </ion-header>
 
-<ion-content #content>
+<ion-content [scrollEvents]="true"
+>
+    <div #scrollMe>
     <ion-list>
         <ion-card-content ion-item *ngFor="let dato of datos">
             <p></p>
+            <ion-text color="primary">
             <h3 >Fecha epoch: </h3>
-            <p>{{dato.date}}</p>
+        </ion-text>
+        <ion-text color="secondary">
+            <p >{{dato.date}}</p>
+        </ion-text>
             <p>
 
             </p>
-            <h3 >Posicion: </h3>
-            <p>{{dato.location}}</p>
+            <ion-text color="primary">
+            <h3 >Posicion: </h3></ion-text>
+            <ion-text color="secondary">
+            <p >{{dato.location}}</p> </ion-text>
                 <p>
 
                 </p>
-            <h3 >Medida: </h3>
-               <p>{{dato.measurement}}</p>
+                <ion-text color="primary">
+
+            <h3 color="primary">Medida: </h3></ion-text>
+            <ion-text color="secondary">
+               <p color="secondary">{{dato.measurement}}</p></ion-text>
                  <p></p>
+                 
         </ion-card-content>
     </ion-list>
+    <p class="ion-padding-start ion-padding-end"><ion-button (click)="irArriba()" expand="block" fill="outline">Ir arriba</ion-button></p>
+          </div>
 </ion-content>
+
+    

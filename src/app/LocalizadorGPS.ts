@@ -7,7 +7,7 @@
 // copyright
 // -------------------------------------------
 import { Injectable } from '@angular/core';
-
+import { Platform } from '@ionic/angular';
 declare var AdvancedGeolocation: any;
 
 @Injectable({
@@ -17,10 +17,12 @@ export class LocalizadorGPSService {
     private ultimaPosicionMedida;
     private posicionActual;
 
-    constructor() {
+    constructor(private platform: Platform) {
+        if(platform.is('cordova')){
         this.ultimaPosicionMedida = { latitud: "", longitud: "", altitud: "" };
         this.posicionActual={ latitud: "", longitud: "", altitud: "" };
 this.iniciarGPS();
+        }
     }
 
     // -------------------------------------------

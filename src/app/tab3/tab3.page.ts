@@ -1,6 +1,14 @@
-import { Component, NgZone, ViewChild} from '@angular/core';
+// -------------------------------------------
+// tab3.page.ts
+// controla lo que se muestra en el tab 3 
+// equipo 5
+// autor: V�ctor Blanco Bataller
+// 19/10/2019
+// copyright
+// -------------------------------------------
+import { Component, NgZone, ViewChild, ElementRef} from '@angular/core';
 import { LaLogicaReceptoraService } from '../LaLogicaReceptora'
-
+import{IonContent} from '@ionic/angular'
 
 
 
@@ -13,20 +21,25 @@ import { LaLogicaReceptoraService } from '../LaLogicaReceptora'
 })
 export class Tab3Page {
 
-    @ViewChild('content',{read:{},static:true}) content:any;
-
+   
+ // used for scrolling the pane
+ @ViewChild(IonContent,{static:false}) content: IonContent;
     datos: any[] = [];
     constructor(public miLogicaReceptora: LaLogicaReceptoraService, private ngZone: NgZone) {
       
     }
 
-    irAbajo(){
+     irAbajo(){
         
-        setTimeout(() => {
-            this.content.scrollToBottom(300);//300ms animation speed
-          });
+       // method used to enable scrolling
+       this.content.scrollToBottom(1000);    }
+
+    irArriba(){
+        this.content.scrollToTop(1000); 
     }
 
+    //------------------------------
+    //esta funcion se llama cuando se entra en el tab por primera vez:
     ngOnInit() {
         this.miLogicaReceptora.obtenerCO(dato => {
 
@@ -37,7 +50,7 @@ export class Tab3Page {
                 var seconds = "0" + dato.date.getSeconds();
                 dato.date= hours.toString() + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);*/
                 this.datos.push(dato)
-               this.irAbajo();
+               
             })
         })
     }

@@ -11,11 +11,17 @@
 </ion-header>
 
 <ion-content>
+        <p class="ion-padding-start ion-padding-end"><ion-button (click)="irAbajo()" expand="block" fill="outline">Ir abajo</ion-button></p>
+
     <ion-list>
         <ion-card-content ion-item *ngFor="let device of devices">
+            <ion-text color="warning">
             <p>{{device.name||'Sin nombre'}}</p>
             <p>{{device.id}}</p>
             <p>{{device.advertising}}</p>
+        </ion-text>
         </ion-card-content>
     </ion-list>
+    <p class="ion-padding-start ion-padding-end"><ion-button (click)="irArriba()" expand="block" fill="outline">Ir arriba</ion-button></p>
+
     </ion-content>
