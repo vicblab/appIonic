@@ -1,0 +1,21 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>
+            Tramas BLE
+        </ion-title>
+        <ion-button (click)="discover()" slot="end">
+            <ion-icon name="Bluetooth"></ion-icon>
+            <p>Escanear</p>
+        </ion-button>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-list>
+        <ion-card-content ion-item *ngFor="let device of devices">
+            <p>{{device.name||'Sin nombre'}}</p>
+            <p>{{device.id}}</p>
+            <p>{{device.advertising}}</p>
+        </ion-card-content>
+    </ion-list>
+    </ion-content>

@@ -1,0 +1,29 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>
+            Tab Three
+        </ion-title>
+        
+    </ion-toolbar>
+</ion-header>
+
+<ion-content #content>
+    <ion-list>
+        <ion-card-content ion-item *ngFor="let dato of datos">
+            <p></p>
+            <h3 >Fecha epoch: </h3>
+            <p>{{dato.date}}</p>
+            <p>
+
+            </p>
+            <h3 >Posicion: </h3>
+            <p>{{dato.location}}</p>
+                <p>
+
+                </p>
+            <h3 >Medida: </h3>
+               <p>{{dato.measurement}}</p>
+                 <p></p>
+        </ion-card-content>
+    </ion-list>
+</ion-content>
