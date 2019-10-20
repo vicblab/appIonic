@@ -1,3 +1,11 @@
+// -------------------------------------------
+// LaLogica.ts
+// Servicio encargado de enviar los datos de CO, temperatura, humedad, hora y posición a firestore
+// equipo 5
+// autor: Víctor Blanco Bataller
+// 13/10/2019
+// copyright
+// -------------------------------------------
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from 'angularfire2/firestore';
 
@@ -12,6 +20,10 @@ export class LaLogicaService {
         this.miColeccion = fireStore.collection<any>('data');
     }
 
+  //--------------------------------------------------
+  //CO, temp, hum, hora, posición--> guardarCO()
+  // método que guarda los datos en mi base de datos de firestore
+  //----------------------------------------------------------
     guardarCO(datosJson: string) {
         
         var jsonFuncional = JSON.parse(datosJson);
@@ -25,5 +37,5 @@ export class LaLogicaService {
 
 
 
-    }
+    }//guardarCO()
 }
