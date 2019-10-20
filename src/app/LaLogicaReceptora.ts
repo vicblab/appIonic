@@ -1,3 +1,11 @@
+// -------------------------------------------
+// LaLogicaReceptora.ts
+// Servicio encargado de recibir los datos de CO, temperatura, humedad, hora y posición de firestore
+// equipo 5
+// autor: Víctor Blanco Bataller
+// 13/10/2019
+// copyright
+// -------------------------------------------
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from 'angularfire2/firestore';
 import { Subject } from 'rxjs';
@@ -24,7 +32,10 @@ export class LaLogicaReceptoraService {
        
     }
 
-  
+  //---------------------------------------------------------------------
+  // obtenerCO --> CO, temp, hum, hora, posición
+  // Método encargado de devolver los últimos datos almacenados en firestore cuando la base de datos es actualizada
+  //---------------------------------------------------------------------
     obtenerCO(callback) {
         // suscribirse a los cambios
       
@@ -34,7 +45,7 @@ export class LaLogicaReceptoraService {
             callback(datosParseados);
         })
        
-    }
+    }//obtenerCO()
 
 
 
